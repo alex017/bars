@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^login/$', views.login, name = 'login'),
     url(r'^logout/$', views.logout, name = 'logout'),
     url(r'^api/themes/$', views.api_themes, name = 'themes'),
+    url(r'^api/tests/$', views.api_tests, name = 'tests'),
     url(r'^$', views.IndexView.as_view(), name = 'index'),
     
 ]

@@ -15,6 +15,7 @@ from .models import Theme, Question, Answer, TestCase
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -69,3 +70,15 @@ def api_themes(request):
         serialized_themes = serializers.serialize('json', themes)
         return HttpResponse(serialized_themes, 'json')
     return HttpResponse('Request must be set via AJAX')
+
+
+@csrf_exempt
+def api_tests(request):
+    if (request.is_ajax() & (request.method == "POST")):
+        theme = request.POST.get("theme", "")
+        tests = TestCase.objects.all()
+        tests = tests.filter(theme_name__name = theme)
+        serialized_tests = serializers.serialize('json', tests)
+        return HttpResponse(serialized_tests, 'json')
+    else:
+        return HttpResponse('Request must be set via AJAX and POST')

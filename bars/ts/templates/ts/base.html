@@ -9,19 +9,28 @@
   url : "api/themes/",
   type: "GET",  
   }).done(function(data){
-  $('.themes').empty();    
+  $('.tests').empty();    
   for (var i = 0; i < data.length; i++ ){
-      var option = $('<a/>').attr('class','theme').attr('onclick', 'showTests('+data[i].fields.name+')').text(data[i].fields.name);
-      $('.themes').append(option);    
+      var option = $('<a/>').attr('class','theme').attr('onclick', "showTests('"+data[i].fields.name+"')").text(data[i].fields.name);
+      $('.tests').append(option);    
   }		      
-		      });		      
-		      }
-		      
+  });		      
+  }
 
 		      
-		      function showTests(theme){
-		      window.alert(5);
-		      }		      
+  function showTests(theme){		      
+  $('.tests').empty();    
+  $.ajax({
+  url : "api/tests/",
+  type: "POST",
+  data: {"theme" : theme},			   
+  }).done(function(data){
+  for (var i = 0; i < data.length; i++) {
+      var option = $('<li/>').attr('class','theme').attr('onclick',"startTest('"+data[i].fields.test_name+"')").text(data[i].fields.test_name);
+  }  
+  $('.tests').append(option);    
+  });		      
+  }		      
 		      
 
 </script>
@@ -31,7 +40,9 @@
     <li>Статистика</li>
     <li onclick = "location.href='/testservice/logout/';">Выйти</li>
 </ul>
-<div class = "themes">
-  
+<div class = "tests">
+  <div id="listTests">
+
+  </div>
 </div>
 {% endblock %}
