@@ -1,9 +1,37 @@
 {% extends "ts/index.html" %}
 
+
 {% block info %}
+
+<script type='text/javascript'>
+  function showThemes(){
+  $.ajax({
+  url : "api/themes/",
+  type: "GET",  
+  }).done(function(data){
+  $('.themes').empty();    
+  for (var i = 0; i < data.length; i++ ){
+      var option = $('<a/>').attr('class','theme').attr('onclick', 'showTests('+data[i].fields.name+')').text(data[i].fields.name);
+      $('.themes').append(option);    
+  }		      
+		      });		      
+		      }
+		      
+
+		      
+		      function showTests(theme){
+		      window.alert(5);
+		      }		      
+		      
+
+</script>
+
 <ul id="tabs">
-    <li class="active" >Тесты</li>
+    <li class = "themeB" onclick = "showThemes()">Тесты</li>
     <li>Статистика</li>
-    <li onclick="location.href='/testservice/logout/';">Выйти</li>
+    <li onclick = "location.href='/testservice/logout/';">Выйти</li>
 </ul>
+<div class = "themes">
+  
+</div>
 {% endblock %}

@@ -11,6 +11,11 @@ from django.core.context_processors import csrf
 from django.shortcuts import render_to_response, redirect
 from django.contrib import auth
 from django.contrib.auth.views import logout
+from .models import Theme, Question, Answer, TestCase
+from django.http import HttpResponse
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core import serializers
+
 
 
 class IndexView(generic.TemplateView):
@@ -57,3 +62,10 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return redirect('/testservice/')
+
+def api_themes(request):
+    if request.is_ajax():
+        themes = Theme.objects.all()
+        serialized_themes = serializers.serialize('json', themes)
+        return HttpResponse(serialized_themes, 'json')
+    return HttpResponse('Request must be set via AJAX')
