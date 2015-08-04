@@ -1,0 +1,61 @@
+{% load staticfiles %}
+<script type='text/javascript' src='/static/js/jquery.js'></script>
+<link rel="stylesheet" type="text/css" href="{% static 'ts/register.css' %}" />
+
+<title>
+  Test service
+</title>
+
+<style type="text/css" media="screen">
+  #header{
+    width: 900px;
+    height: 200px;
+    background-color: #25B33f;
+    margin-bottom: 10px;
+    background-image: url("{% static 'ts/head.png'%}") 
+  }
+  #reg{
+  padding-left: 200px;
+  padding-right: 100px;
+  }
+  #my_form p input{
+    float: center;
+    clear: center;
+  }
+  #my_form p input[type="submit"] {
+  -moz-box-shadow:inset 0px 1px 0px 0px #3dc21b;
+  -webkit-box-shadow:inset 0px 1px 0px 0px #3dc21b;
+  box-shadow:inset 0px 1px 0px 0px #3dc21b;
+  background-color:#44c767;
+  -moz-border-radius:6px;
+  -webkit-border-radius:6px;
+  border-radius:6px;
+  border:1px solid #18ab29;
+  display:inline-block;
+  cursor:pointer;
+  color:#ffffff;
+  font-family:Arial;
+  font-size:15px;
+  font-weight:bold;
+  padding:7px 24px;
+  text-decoration:none;
+  text-shadow:0px 1px 0px #2f6627;  
+  }
+  
+  .errorlist{
+  color : red;
+  }
+  
+  
+	 
+</style>
+<div id="header">
+</div>  
+
+
+<body>
+  <div id="reg">
+  {% block login %}
+  {% endblock %}
+  </div>
+</body>  

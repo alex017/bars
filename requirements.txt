@@ -1,1 +1,2 @@
-django
+django==1.8.3
+django-jquery==1.9.1

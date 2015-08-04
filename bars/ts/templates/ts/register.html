@@ -1,0 +1,14 @@
+{% extends "ts/index.html" %}
+
+{% block login %}
+<div id = "my_form">
+  <form = 'register' method = 'post'>
+    {% csrf_token %}
+    {{form.as_p}}
+    <p>
+    <input class="button" type="submit" value="Зарегистрироваться">
+  </form>
+
+</div>
+
+{% endblock %}
