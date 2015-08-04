@@ -46,7 +46,37 @@
   color : red;
   }
   
-  
+  ul#tabs {
+    list-style-type: none;
+    padding: 0;
+    text-align: left;
+  }
+  ul#tabs li {
+  display: inline-block;
+  background-color: #32c896;
+  border-bottom: solid 5px #238b68;
+  padding: 5px 20px;
+  margin-bottom: 4px;
+  color: #fff;
+  cursor: pointer;
+  }
+  ul#tabs li:hover {
+  background-color: #238b68;
+  }
+  ul#tabs li.active {
+  background-color: #238b68;
+  }
+  ul#tab {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  }
+  ul#tab li {
+  display: none;
+  }
+  ul#tab li.active {
+  display: block;
+  }
 	 
 </style>
 <div id="header">
@@ -55,7 +85,7 @@
 
 <body>
   <div id="reg">
-  {% block login %}
+  {% block info %}
   {% endblock %}
   </div>
 </body>  

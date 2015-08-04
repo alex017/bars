@@ -1,6 +1,11 @@
 {% extends "ts/index.html" %}
 
-{% block login %}
+{% block info %}
+<ul id="tabs">
+    <li onclick="location.href='/testservice/login/';">Войти</li>
+    <li class="active">Зарегистрироваться</li>
+</ul>
+
 <div id = "my_form">
   <form = 'register' method = 'post'>
     {% csrf_token %}

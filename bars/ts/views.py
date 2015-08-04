@@ -10,10 +10,16 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response, redirect
 from django.contrib import auth
+from django.contrib.auth.views import logout
 
 
 class IndexView(generic.TemplateView):
-    template_name = 'ts/index.html'
+    def get(self, request):
+        if request.user.is_authenticated():
+            template_name = 'ts/base.html'
+            return render_to_response(template_name)
+        else:
+            return redirect('/testservice/login')
 
 def register(request):
     args = {}
@@ -48,3 +54,6 @@ def login(request):
     else:
         return render_to_response('ts/login.html', args)    
 
+def logout(request):
+    auth.logout(request)
+    return redirect('/testservice/')
