@@ -9,11 +9,11 @@ class AnswerAdmin(admin.TabularInline):
 class QuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Question', {'fields' : ['name']}),
-        ('Theme', {'fields' : ['theme_name']}),
+     #   ('Theme', {'fields' : ['theme_name']}),
     ]
     inlines = [AnswerAdmin]
-    list_display = ('name', 'theme_name')
-    list_filter = ['theme_name']
+    #list_display = ('name', 'theme_name')
+    #list_filter = ['theme_name']
 
 admin.site.register(Theme)
 admin.site.register(Question, QuestionAdmin)

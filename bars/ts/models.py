@@ -5,8 +5,14 @@ class Theme(models.Model):
     def __str__(self):
         return self.name
 
-class Question(models.Model):
+class TestCase(models.Model):
+    test_name = models.CharField(max_length = 50)
     theme_name = models.ForeignKey(Theme)
+    def __str__(self):
+        return self.test_name
+
+class Question(models.Model):
+    test_name = models.ForeignKey(TestCase)
     name = models.CharField(max_length = 200)
     def __str__(self):
         return self.name
