@@ -17,7 +17,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
-
+import json
 
 class IndexView(generic.TemplateView):
     def get(self, request):
@@ -71,10 +71,9 @@ def api_themes(request):
         return HttpResponse(serialized_themes, 'json')
     return HttpResponse('Request must be set via AJAX')
 
-
 @csrf_exempt
 def api_tests(request):
-    if (request.is_ajax() & (request.method == "POST")):
+    if request.is_ajax() & (request.method == "POST"):
         theme = request.POST.get("theme", "")
         tests = TestCase.objects.all()
         tests = tests.filter(theme_name__name = theme)
@@ -82,3 +81,22 @@ def api_tests(request):
         return HttpResponse(serialized_tests, 'json')
     else:
         return HttpResponse('Request must be set via AJAX and POST')
+
+@csrf_exempt
+def api_dotest(request):
+    if request.is_ajax() & (request.method == "POST"):
+        test_name = request.POST.get("test_name","")
+        question_id = request.POST.get("question_id","")
+        questions = Question.objects.all().filter(test_name__test_name = test_name)
+        question = questions.get(id = question_id)
+        answers = Answer.objects.all().filter(question__name = question.name)
+        response_data = {}
+        answer = []
+        response_data['question'] = question.name
+        for obj in answers:            
+            answer.append(obj.name)
+        response_data['answers'] = answer
+        return HttpResponse(json.dumps(response_data), content_type="application/json")        
+    else:
+        return HttpResponse('Request must be set via AJAX and POST')
+    

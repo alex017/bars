@@ -30,7 +30,34 @@
   }  
   $('.tests').append(option);    
   });		      
-  }		      
+  }
+
+
+  function startTest(testName){
+  $('.tests').empty();
+  $.ajax({
+  url : "api/dotest/",
+  type: "POST",
+  data: {"test_name" : testName,
+         "question_id"   : 1},
+  }).done(function(data){
+  console.log(data);
+  var question = $('<div\>').text(data['question']);
+  var answers = $('<ul\>');
+  for (var i=0; i<data['answers'].length; i++) {
+      var option = $('<li/>');
+      var option1 = $('<a/>').attr('class','theme').text(data['answers'][i]);
+      option.append(option1);
+      answers.append(option);
+  }
+   
+  $('.tests').append(question);
+  $('.tests').append(answers);
+  });
+  }
+		      
+		      
+		      
 		      
 
 </script>
