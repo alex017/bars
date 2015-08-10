@@ -11,7 +11,7 @@ from django.core.context_processors import csrf
 from django.shortcuts import render_to_response, redirect
 from django.contrib import auth
 from django.contrib.auth.views import logout
-from .models import Theme, Question, Answer, TestCase
+from .models import Theme, Question, Answer, TestCase, UserTestCaseAnswer, UserAnswer, TestQuestions
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core import serializers
@@ -74,29 +74,91 @@ def api_themes(request):
 @csrf_exempt
 def api_tests(request):
     if request.is_ajax() & (request.method == "POST"):
-        theme = request.POST.get("theme", "")
+        theme_pk = request.POST.get("theme_pk", "")
         tests = TestCase.objects.all()
-        tests = tests.filter(theme_name__name = theme)
+        tests = tests.filter(theme_name__pk = theme_pk)
         serialized_tests = serializers.serialize('json', tests)
         return HttpResponse(serialized_tests, 'json')
     else:
         return HttpResponse('Request must be set via AJAX and POST')
 
+
+def responseData(question, answers):
+    response_data = {}
+    response_data['question'] = question.name
+    answer = []
+    for ans in answers:
+        answer.append([ans.pk, ans.name])
+    response_data['answer'] = answer
+    response_data['statistic'] = False
+    return response_data
+    
 @csrf_exempt
+@login_required
 def api_dotest(request):
     if request.is_ajax() & (request.method == "POST"):
-        test_name = request.POST.get("test_name","")
-        question_id = request.POST.get("question_id","")
-        questions = Question.objects.all().filter(test_name__test_name = test_name)
-        question = questions.get(id = question_id)
-        answers = Answer.objects.all().filter(question__name = question.name)
-        response_data = {}
-        answer = []
-        response_data['question'] = question.name
-        for obj in answers:            
-            answer.append(obj.name)
-        response_data['answers'] = answer
+        test_pk = request.POST.get("test_pk","")
+        testCase = TestCase.objects.all().get(pk = test_pk)
+        
+        # delete old statistic
+        usertestCases = UserTestCaseAnswer.objects.filter(user = request.user)
+        for usertestCase in usertestCases:
+            testQuestions = TestQuestions.objects.filter(user_test_case_answer = usertestCase)
+            for testQuestion in testQuestions:
+                testQuestion.delete()
+            usertestCase.delete()
+            
+        # create db for new statistic   
+        userTestCaseAnswer = UserTestCaseAnswer(user = request.user, test_case_name = testCase)
+        userTestCaseAnswer.save()
+        
+        questions = list(Question.objects.all().filter(test_name__pk = test_pk))
+        question = questions.pop(0)
+        answers = Answer.objects.all().filter(question__pk = question.pk)
+               
+        response_data = responseData(question, answers)
+
         return HttpResponse(json.dumps(response_data), content_type="application/json")        
     else:
         return HttpResponse('Request must be set via AJAX and POST')
+
+@csrf_exempt
+@login_required
+def api_nextquestion(request):
+    if request.is_ajax() & (request.method == "POST"):
+        test_pk = request.POST.get("test_pk","")
+        testCase = TestCase.objects.all().get(pk = test_pk)
+        answer_pk = request.POST.get("answer_pk", "")
+        userAnsw = Answer.objects.all().get(pk = answer_pk)
+        question_pk = userAnsw.question.pk
+        userTestCaseAnswer = UserTestCaseAnswer.objects.filter(user = request.user).get(test_case_name__pk = testCase.pk)
+        userAnswer = UserAnswer(user_answer = userAnsw, user_test_case_answer = userTestCaseAnswer)
+        userAnswer.save()
+        question_pk += 1
+        question = Question.objects.filter(test_name__pk = testCase.pk)
+        question = list(question.filter(pk__gte = question_pk))
+        if question:
+            question = question.pop(0)
+            answers = Answer.objects.filter(question__pk = question.pk)
+            response_data = responseData(question, answers)
+        else:
+            userAnswers = UserAnswer.objects.all().filter(user_test_case_answer = userTestCaseAnswer)
+            response_data = {}
+            questions = []
+            answerResult = []
+            for userAnswer in userAnswers:
+                question = Question.objects.get(pk = userAnswer.user_answer.question.pk)
+                questions.append(question.name)
+                answerResult.append([userAnswer.user_answer.isRight, userAnswer.user_answer.name])
+            response_data['question'] = questions
+            response_data['answerResult'] = answerResult
+            userAnswersRight = userAnswers.filter(user_answer__isRight = True)
+            response_data['countOfRightAnswers'] = len(userAnswersRight)
+            response_data['statistic'] = True
+            response_data['percent'] = (len(userAnswersRight) / len(userAnswers)) * 100
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+        return HttpResponse('Request must be set via AJAX and POST')
     
+    
+

@@ -11,53 +11,93 @@
   }).done(function(data){
   $('.tests').empty();    
   for (var i = 0; i < data.length; i++ ){
-      var option = $('<a/>').attr('class','theme').attr('onclick', "showTests('"+data[i].fields.name+"')").text(data[i].fields.name);
+      var option = $('<a/>').attr('class','theme').attr('onclick', "showTests('"+data[i].pk+"')").text(data[i].fields.name);
       $('.tests').append(option);    
   }		      
   });		      
   }
 
 		      
-  function showTests(theme){		      
+  function showTests(theme_pk){		      
   $('.tests').empty();    
   $.ajax({
   url : "api/tests/",
   type: "POST",
-  data: {"theme" : theme},			   
+  data: {"theme_pk" : theme_pk},			   
   }).done(function(data){
   for (var i = 0; i < data.length; i++) {
-      var option = $('<li/>').attr('class','theme').attr('onclick',"startTest('"+data[i].fields.test_name+"')").text(data[i].fields.test_name);
+      var option = $('<li/>').attr('class','theme').attr('onclick',"startTest('"+data[i].pk+"')").text(data[i].fields.test_name);
   }  
   $('.tests').append(option);    
   });		      
   }
 
+  function showQuestion(data, test_pk){
+  var question = $('<div\>').text(data['question']);
+  var listAnswers = $('<ul\>');
+  for (var i=0; i<data['answer'].length; i++) {
+     var answerli = $('<li/>');
+     var answer = $('<a/>').attr('class','theme').attr('onclick',"nextQuestion('" +test_pk+"', '"+data['answer'][i][0]+"')").text(data['answer'][i][1]);
+     listAnswers.append(answerli);
+     answerli.append(answer);
+  }
+  $('.tests').append(question);
+  $('.tests').append(listAnswers);
+  }		      
 
-  function startTest(testName){
+  function startTest(test_pk){
   $('.tests').empty();
+  var listAnswers = $('<div\>');
   $.ajax({
   url : "api/dotest/",
   type: "POST",
-  data: {"test_name" : testName,
-         "question_id"   : 1},
+  data: {"test_pk" : test_pk},
   }).done(function(data){
-  console.log(data);
-  var question = $('<div\>').text(data['question']);
-  var answers = $('<ul\>');
-  for (var i=0; i<data['answers'].length; i++) {
-      var option = $('<li/>');
-      var option1 = $('<a/>').attr('class','theme').text(data['answers'][i]);
-      option.append(option1);
-      answers.append(option);
-  }
-   
-  $('.tests').append(question);
-  $('.tests').append(answers);
+  //console.log(data);
+  showQuestion(data, test_pk);
   });
   }
+
+ function showStatistic(data){
+ var statisticList = $('<ul\>');
+ for (var i=0; i<data['question'].length; i++) {
+     var statisticli = $('<li/>');
+     var question = $('<div\>').text(data['question'][i]);
+     var answer = $('<div\>').attr('class',data['answerResult'][i][0]).text(data['answerResult'][i][1]);
+     statisticli.append(question);
+     statisticli.append(answer);
+     statisticList.append(statisticli);
+ }
+ var countOfRight = $('<div\>').text('количество правильных ответов = ' + data['countOfRightAnswers']);
+ var countOfQuestions = $('<div\>').text('количество вопросов = ' + data['question'].length);
+ var statistic = $('<div\>').text('процент правильных ответов = ' + data['percent'] + '%');
+ statisticList.append($('<hr/>'))
+ statisticList.append(countOfRight);
+ statisticList.append(countOfQuestions);
+					  
+ statisticList.append(statistic);  
+					  
+ $('.tests').append(statisticList);
+ }
 		      
-		      
-		      
+ function nextQuestion(test_pk, answer_pk){
+ $('.tests').empty();
+ var listAnswers = $('<div/>');
+ $.ajax({
+ url  : "api/nextquestion/",
+ type : "POST",
+ data : {"test_pk"  : test_pk,
+         "answer_pk": answer_pk},
+ }).done(function(data){
+ //console.log(data);
+ if (data['statistic'] == true) {
+     showStatistic(data);					  
+ }
+ else{
+     showQuestion(data, test_pk);
+ }
+ });
+ }
 		      
 
 </script>
@@ -68,8 +108,6 @@
     <li onclick = "location.href='/testservice/logout/';">Выйти</li>
 </ul>
 <div class = "tests">
-  <div id="listTests">
-
-  </div>
+  
 </div>
 {% endblock %}

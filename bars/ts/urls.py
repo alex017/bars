@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^api/themes/$', views.api_themes, name = 'themes'),
     url(r'^api/tests/$', views.api_tests, name = 'tests'),
     url(r'^api/dotest/$', views.api_dotest, name = 'dotest'),
+    url(r'^api/nextquestion/$', views.api_nextquestion, name = 'nextquestion'),
     url(r'^$', views.IndexView.as_view(), name = 'index'),
     
 ]
